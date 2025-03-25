@@ -34,9 +34,8 @@ public class TaskList {
         this.board = board;
     }
 
-    public Task addTask(Task task) {
+    public void addTask(Task task) {
         tasks.add(task); 
-        return task;
     }
 
     public void removeTask(Task task) {

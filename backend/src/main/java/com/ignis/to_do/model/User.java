@@ -34,7 +34,6 @@ public class User{
     private String password;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards;
-    
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -43,14 +42,11 @@ public class User{
     }
 
     public List<Board> createBoard(Board board){
-
         boards.add(board);
-
         return boards;
     }
 
     public void deleteBoard(Board board){
-        
-        this.boards.remove(board);
-    }   
+        boards.remove(board);
+    }
 }

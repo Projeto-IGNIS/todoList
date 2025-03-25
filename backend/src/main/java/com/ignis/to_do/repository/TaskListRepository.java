@@ -23,4 +23,10 @@ public interface TaskListRepository extends JpaRepository<TaskList, Long>{
         @Param("boardId") Long boardId
         );
 
+    @Modifying
+    @Query("UPDATE task_list tl SET tl.name = :name WHERE tl.id = :id")
+    void updateTaskListTitle(
+        @Param("id") Long id,
+        @Param("name") String name
+        );
 }
