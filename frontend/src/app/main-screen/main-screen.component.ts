@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-main-screen',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [CommonModule, DragDropModule, RouterModule],
   templateUrl: './main-screen.component.html',
   styleUrls: ['./main-screen.component.css']
 })

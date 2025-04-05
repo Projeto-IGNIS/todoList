@@ -21,6 +21,7 @@ public class BoardService {
     private final UserService userService; 
     
     private static final String BOARD_NOT_FOUND = "Board com ID %s nao encontrado";
+    private static final String BOARD_ALREADY_EXISTS = "Board com nome %s já existe";
 
     public BoardService(BoardRepository boardRepository, UserService userService) {
         this.boardRepository = boardRepository;
@@ -31,7 +32,7 @@ public class BoardService {
 
         Optional<Board> existingBoard = boardRepository.findByTitle(boardDTO.getTitle());
         if (existingBoard.isPresent()) {
-            throw new BoardAlreadyExistsException("Board com nome '" + boardDTO.getTitle() + "' já existe.");
+            throw new BoardAlreadyExistsException(BOARD_ALREADY_EXISTS.formatted(boardDTO.getTitle()));
         }
 
         User user = userService.getUser(boardDTO.getOwnerId());   
@@ -76,11 +77,9 @@ public class BoardService {
     }
 
     public boolean isFavorite(Long boardId) {
-
-        verifyIfBoardExists(boardId);
-        Board boardIsFavorite = boardRepository.findById(boardId).orElseThrow(()
-         -> new BoardNotFoundException(BOARD_NOT_FOUND.formatted(boardId)));
-        return boardIsFavorite.isFavorite();
+        return boardRepository.findById(boardId)
+                .map(Board::isFavorite)
+                .orElseThrow(() -> new BoardNotFoundException(BOARD_NOT_FOUND.formatted(boardId)));
     }
 
     @Transactional

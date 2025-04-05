@@ -13,7 +13,7 @@ import com.ignis.to_do.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNameAndEmail(String name, String email);
-    boolean existsByNameAndEmailAndPassword(String name, String email, String password);
+    boolean existsByEmailAndPassword(String email, String password);
     Optional<User> findByEmail(String email);
 
     @Modifying

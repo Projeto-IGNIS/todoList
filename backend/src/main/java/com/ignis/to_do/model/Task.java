@@ -62,6 +62,7 @@ public class Task {
     } 
     
     public void assignCategory(Category category) {
+        //this.category = category;
         this.setCategory(category);
     }
 
