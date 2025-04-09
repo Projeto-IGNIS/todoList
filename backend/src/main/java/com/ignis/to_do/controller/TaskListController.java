@@ -41,6 +41,12 @@ public class TaskListController {
 
         return taskListService.getAllTaskLists();
     }
+
+    @GetMapping("/taskListByBoardId/{boardId}")
+    public Iterable<TaskListDTO> getTaskListsByBoardId(@PathVariable Long boardId) {
+
+        return taskListService.getTaskListsByBoardId(boardId);
+    }
     
     @PutMapping("/updateTaskList")     
     public TaskListDTO updateTaskListTitle(

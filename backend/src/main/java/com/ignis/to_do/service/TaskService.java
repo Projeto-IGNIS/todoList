@@ -2,10 +2,13 @@ package com.ignis.to_do.service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
 import com.ignis.to_do.dto.TaskDTO;
+import com.ignis.to_do.dto.TaskListDTO;
 import com.ignis.to_do.exception.task_exception.TaskNotFoundException;
 import com.ignis.to_do.model.Task;
 import com.ignis.to_do.model.TaskList;
@@ -57,6 +60,12 @@ public class TaskService implements TaskReminder {
             .toList();
     }
     
+    public Iterable<TaskDTO> getTasksByTaskListId(Long taskListId) {
+        TaskList taskList = taskListService.getList(taskListId);
+        return StreamSupport.stream(taskList.getTasks().spliterator(), false)
+            .map(task -> new TaskDTO(task.getId(), task.getTitle(), task.getStatus(), task.getList().getId()))
+            .toList();
+    }
     public void deleteTaskById(Long taskId) { 
         verifyIfTaskExists(taskId);       
         taskRepository.deleteById(taskId);     

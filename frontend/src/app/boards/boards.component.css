@@ -12,6 +12,20 @@ header {
   align-items: center;
 }
 
+.board-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.board-actions{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 10px;
+  
+}
+
 .boards-header {
   display: flex;
   align-items: center;
@@ -118,7 +132,6 @@ header {
   background: none;
   border: none;
   font-size: 18px;
-  color: #ff4d4d;
   cursor: pointer;
 }
 
@@ -148,8 +161,8 @@ header button {
   background-color: #007bff;
   color: #ffffff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 2px;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
@@ -177,16 +190,16 @@ header button {
 }
 
 .create-board-form {
-  position: fixed; /* Make the form fixed to the viewport */
-  top: 50%; /* Center vertically */
-  left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%); /* Adjust for centering */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 400px;
-  z-index: 1000; /* Ensure it appears above other content */
+  z-index: 1000; 
 }
 
 .create-board-form h3 {
@@ -203,16 +216,19 @@ header button {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
+  
 }
 
 .form-textarea {
-  resize: none;
+  resize: vertical;
   height: 80px;
 }
 
 .form-actions {
   display: flex;
   justify-content: space-between;
+  margin-top: 20px;
+
 }
 
 .form-submit-button {
@@ -256,11 +272,95 @@ header button {
 }
 
 .overlay {
-  position: fixed; /* Cover the entire viewport */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  z-index: 999; /* Ensure it appears below the form but above other content */
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999; 
 }
+
+
+/* Estilos para a barra lateral */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Estilos para a barra lateral em telas menores */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100px;
+  }
+}
+
+/* Estilos para a barra lateral em telas muito menores */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 50px;
+  }
+}
+
+/* Estilos para o botão de voltar em telas menores */
+@media (max-width: 768px) {
+  .sidebar .back-button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar .back-button {
+    font-size: 12px;
+  }
+}
+
+
+.menu-button {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 20px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button:hover {
+  background-color: #0a4483;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.menu-button:active {
+  background-color: #003f7f;
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .sidebar .menu-button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar .menu-button {
+    font-size: 12px;
+  }
+}
+

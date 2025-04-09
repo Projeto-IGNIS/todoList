@@ -16,6 +16,12 @@ public interface TaskListRepository extends JpaRepository<TaskList, Long>{
 
     Optional<TaskList> findByName(String name);
 
+    Optional<TaskList> findById(Long id);
+
+    @Query("SELECT tl FROM task_list tl WHERE tl.board.id = :boardId")
+    Iterable<TaskList> findByBoardId(@Param("boardId") Long boardId);   
+    
+
     @Modifying
     @Query("UPDATE task_list tl SET tl.board.id = :boardId WHERE tl.id = :id")
     void updateBoardId(

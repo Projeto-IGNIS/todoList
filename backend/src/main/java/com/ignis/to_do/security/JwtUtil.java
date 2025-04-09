@@ -30,6 +30,7 @@ public class JwtUtil {
         String password = userDTO.getPassword();
         
         return Jwts.builder()
+                // .setSubject(username)
                 .setSubject(email)
                 .setSubject(password)
                 .setIssuedAt(new Date())
