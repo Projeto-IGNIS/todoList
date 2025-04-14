@@ -1,9 +1,5 @@
 package com.ignis.to_do.service;
 
-<<<<<<< HEAD
-import java.util.Optional;
-=======
->>>>>>> 8209d4ed1e44eddc5f8ef552f03c3e958d8289ba
 import org.springframework.stereotype.Service;
 import com.ignis.to_do.dto.UserDTO;
 import com.ignis.to_do.exception.user_exception.UserAlreadyExistsException;
@@ -28,12 +24,7 @@ public class UserService {
 
     public UserDTO createUser(UserDTO userDTO) {
         if (userDTO.getId() != null) {
-<<<<<<< HEAD
-
-            verifyIfUserExists(userDTO.getId());
-=======
             verifyIfUserExists(userDTO);
->>>>>>> f792b8ef9935a18b7cf3675e3666045444f1856b
         } else if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException(USER_ALREADY_EXISTS.formatted(userDTO.getEmail()));
         }
