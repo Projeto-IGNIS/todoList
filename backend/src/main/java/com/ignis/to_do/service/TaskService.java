@@ -77,6 +77,7 @@ public class TaskService implements TaskReminder {
     
     @Override
     public Boolean checkOverdueTasks(Long taskId) {
+
         Task task = taskRepository.findById(taskId).orElseThrow(
             () -> new TaskNotFoundException(TASK_NOT_FOUND.formatted(taskId)));
 
@@ -94,8 +95,7 @@ public class TaskService implements TaskReminder {
 
     @Override
     public String sendTaskReminder() {
-        
-        return "Task is overdue";
+            return null;
     }
 
     public Iterable<TaskDTO> checkAllOverdueTasks() {
@@ -113,5 +113,6 @@ public class TaskService implements TaskReminder {
         }
 
        return allOverdueTasks;
+
     }
 }
