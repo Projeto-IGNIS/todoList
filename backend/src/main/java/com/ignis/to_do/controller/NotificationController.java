@@ -13,7 +13,7 @@ public class NotificationController {
     public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
-
+    
     @GetMapping("/getNotifications")
     public String getNotifications() {
        

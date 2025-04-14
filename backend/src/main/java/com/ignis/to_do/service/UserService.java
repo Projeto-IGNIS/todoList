@@ -1,6 +1,9 @@
 package com.ignis.to_do.service;
 
+<<<<<<< HEAD
 import java.util.Optional;
+=======
+>>>>>>> 8209d4ed1e44eddc5f8ef552f03c3e958d8289ba
 import org.springframework.stereotype.Service;
 import com.ignis.to_do.dto.UserDTO;
 import com.ignis.to_do.exception.user_exception.UserAlreadyExistsException;

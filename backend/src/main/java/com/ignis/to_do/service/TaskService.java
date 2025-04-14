@@ -81,10 +81,16 @@ public class TaskService implements TaskReminder {
     
     @Override
     public Boolean checkOverdueTasks(Long taskId) {
+<<<<<<< HEAD
         
         verifyIfTaskExists(taskId);
         Task task = taskRepository.findById(taskId).orElseThrow(()
          -> new TaskNotFoundException(TASK_NOT_FOUND.formatted(taskId)));
+=======
+        Task task = taskRepository.findById(taskId).orElseThrow(
+            () -> new TaskNotFoundException(TASK_NOT_FOUND.formatted(taskId)));
+
+>>>>>>> 8209d4ed1e44eddc5f8ef552f03c3e958d8289ba
         LocalDate today = LocalDate.now();
         LocalDate taskDueDate = task.getDueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -98,9 +104,15 @@ public class TaskService implements TaskReminder {
     }
 
     @Override
+<<<<<<< HEAD
     public void sendTaskReminder() {
 <<<<<<< HEAD
     
+=======
+    public String sendTaskReminder() {
+        
+        return "Task is overdue";
+>>>>>>> 8209d4ed1e44eddc5f8ef552f03c3e958d8289ba
     }
 
     public Iterable<TaskDTO> checkAllOverdueTasks() {
@@ -118,8 +130,11 @@ public class TaskService implements TaskReminder {
         }
 
        return allOverdueTasks;
+<<<<<<< HEAD
 =======
     // TODO
 >>>>>>> f792b8ef9935a18b7cf3675e3666045444f1856b
+=======
+>>>>>>> 8209d4ed1e44eddc5f8ef552f03c3e958d8289ba
     }
 }
