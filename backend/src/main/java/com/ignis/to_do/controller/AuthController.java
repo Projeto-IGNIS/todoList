@@ -12,8 +12,6 @@ import com.ignis.to_do.dto.UserDTO;
 import com.ignis.to_do.security.JwtUtil;
 import com.ignis.to_do.service.UserService;
 
-
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -29,13 +27,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
 
-        if (userService.verifyIfUserExists(userDTO)){
+        if (userService.loginVerify(userDTO)){
             String token = jwtUtil.generateToken(userDTO);
             return ResponseEntity.ok(token);
         }
 
         return ResponseEntity.status(401).body("Usuário não encontrado");   
-
     }
 
     @GetMapping("/ownerId/{email}")

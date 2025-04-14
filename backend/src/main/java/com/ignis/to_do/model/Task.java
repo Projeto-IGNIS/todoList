@@ -34,10 +34,12 @@ public class Task {
     private Category category;
     private Date dueDate;
 
-    public Task(String title, TaskList list, String status) {
+    public Task(String title, TaskList list, String description, String status, Date dueDate) {
         this.title = title;
         this.list = list;
+        this.description = description;
         this.status = status;
+        this.dueDate = dueDate; // Set default due date to current date
     }
 
     public Task createTask(Task task) {  

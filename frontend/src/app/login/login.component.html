@@ -56,6 +56,7 @@
   <!-- Mensagem de boas-vindas -->
   <div *ngIf="loginSuccess" class="welcome-message">
     Bem-vindo(a), <strong>{{ userName }}</strong>!
+    <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
   </div>
 </div>
 

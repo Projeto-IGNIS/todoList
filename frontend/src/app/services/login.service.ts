@@ -20,6 +20,13 @@ export class LoginService {
 
   }
 
+  clearLocalStorage(): void {
+    debugger;
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('ownerId');
+  }
+
+
   getOwnerId(email: string): Observable<string> {
     return this.http.get(this.apiUrl+"auth/ownerId/"+email, { responseType: 'text' });
   }

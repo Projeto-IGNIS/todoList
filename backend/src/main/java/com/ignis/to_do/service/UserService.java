@@ -90,4 +90,8 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(()
          -> new UserNotFoundException(USER_NOT_FOUND.formatted(userId)));
     }
+
+    public boolean loginVerify(UserDTO userDTO) {
+        return userRepository.existsByEmailAndPassword(userDTO.getEmail(), userDTO.getPassword());
+    }
 }

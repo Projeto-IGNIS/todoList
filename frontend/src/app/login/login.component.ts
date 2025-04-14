@@ -2,12 +2,14 @@ import { Component, inject } from '@angular/core';
 import { LoginService } from '../services/login.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, MatProgressBarModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -28,6 +30,7 @@ export class LoginComponent {
   });
 
   onLogin() {
+    this.loginService.clearLocalStorage();
     const formValues = this.loginForm.value;
     console.log('Valores do formulário:', formValues);
 
@@ -41,7 +44,7 @@ export class LoginComponent {
           this.router.navigate(['/boards']);
         }, 2000);
       },
-      error: (error) => {
+      error: (error) => { 
         console.error('Erro no login:', error);
         this.loginError = 'Email ou senha incorreto';
         setTimeout(() => {

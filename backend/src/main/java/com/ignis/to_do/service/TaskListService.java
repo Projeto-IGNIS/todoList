@@ -7,6 +7,7 @@ import com.ignis.to_do.exception.task_list_exception.TaskListNotFoundException;
 import com.ignis.to_do.model.Board;
 import com.ignis.to_do.model.TaskList;
 import com.ignis.to_do.repository.TaskListRepository;
+import java.util.stream.StreamSupport;
 
 import jakarta.transaction.Transactional;
 
@@ -39,6 +40,12 @@ public class TaskListService {
         return taskListRepository.findById(taskLitsId)
                 .map(taskList -> new TaskListDTO(taskList.getId(), taskList.getName(), taskList.getBoard().getId()))
                 .orElseThrow(() -> new TaskListNotFoundException(TASK_LIST_NOT_FOUND.formatted(taskLitsId)));
+    }
+
+    public Iterable<TaskListDTO> getTaskListsByBoardId(Long boardId) {
+        return StreamSupport.stream(taskListRepository.findByBoardId(boardId).spliterator(), false)
+            .map(taskList -> new TaskListDTO(taskList.getId(), taskList.getName(), taskList.getBoard().getId()))
+            .toList();
     }
 
     public void verifyIfTaskListExists(Long taskListId) {

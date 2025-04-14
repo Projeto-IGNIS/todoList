@@ -114,6 +114,11 @@ O back-end será construído utilizando o framework **Spring Boot** com **Postgr
    mvn spring-boot:run
    ```
 
+   1. obs: Casa esteja no WSL ou SO linux mesmo e estiver recebendo "Permission denied" na hora de fazer o clean -f, faça:
+
+   ```bash
+   chmod +x backend/mvnw
+   ```
 4. Crie um arquivo `.env` na raiz do diretório `backend/` e adicione as configurações necessárias. Este arquivo irá conter variáveis de ambiente para as credenciais do banco de dados e outros parâmetros de configuração.
 
    **Exemplo de conteúdo do `.env`:**
