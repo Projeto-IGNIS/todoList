@@ -5,31 +5,16 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class LoginService {
-  private readonly apiUrl = 'http://localhost:8080/'; // URL do backend
+export class SignUpService {
+  private readonly apiUrl = 'http://localhost:8080/users'; // URL do backend
 
   private readonly http=inject(HttpClient);
   
-  getAllUsers(): Observable<string> {
-    return this.http.get(this.apiUrl+"users/all", { responseType: 'text' });
-  }
-
-  login(user: { email: string; password: string }) {
-    console.log("TA AI");
-    return this.http.post(this.apiUrl+"auth/login", user, { responseType: 'text' });
+  signUp(user: {name: string; email: string; password: string }) {
+    return this.http.post(this.apiUrl+"/createUser", user, { responseType: 'text' });
 
   }
 
-  clearLocalStorage(): void {
-    debugger;
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('ownerId');
-  }
-
-
-  getOwnerId(email: string): Observable<string> {
-    return this.http.get(this.apiUrl+"auth/ownerId/"+email, { responseType: 'text' });
-  }
 
   saveToken(token: string): void {
     localStorage.setItem('jwtToken', token);

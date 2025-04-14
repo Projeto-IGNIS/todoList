@@ -13,8 +13,8 @@ public class UserValidator {
         this.userRepository = userRepository;
     }   
 
-    public boolean validateUser(String name, String email, String password) {
-        return userRepository.existsByNameAndEmailAndPassword(name, email, password);
+    public boolean validateUser(String email, String password) {
+        return userRepository.existsByEmailAndPassword(email, password);
     }  
     
 }

@@ -10,7 +10,7 @@ CREATE TABLE board (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     owner_id INT,
-    isFavorite BOOLEAN DEFAULT FALSE,
+    favorite BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL
 );
 

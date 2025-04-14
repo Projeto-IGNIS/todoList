@@ -1,62 +1,160 @@
+<header class="main-header">
+  <div class="header-content">
+      <h1>{{ boardName }}</h1>
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+        <img src="https://img.icons8.com/?size=100&id=37924&format=png&color=000000" alt="">
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="toggleRenameBoardForm()">
+          <span>Rename</span>
+        </button>
+      </mat-menu>
+  </div>
+
+  
+  <button routerLink="/boards" class="boards-button">Ir para Boards</button>
+  
+</header>
 <div class="board-container">
-
-  <div class="list-container">
-    <h2 class="list-title">TODO</h2>
-    <div
-      cdkDropList
-      #todoList="cdkDropList"
-      [cdkDropListData]="todo"
-      [cdkDropListConnectedTo]="[inProgressList, doneList]"
-      class="task-list"
-      (cdkDropListDropped)="drop($event)"
-    >
-      @for (task of todo; track task) {
-        <div class="task-card" cdkDrag>
-          <h3 class="task-title">{{ task.title }}</h3>
-          <p class="task-description">{{ task.description }}</p>
-        </div>
-      }
-      <button class="add-task-button" (click)="addTask('todo')">+ Adicionar Tarefa</button>
+  <div class="board-container">
+    <div *ngFor="let taskList of taskLists; trackBy: trackByTaskListId" class="list-container">
+      <div class="list-title">
+        <h2 class="list-name">{{ taskList.name }}</h2>
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+          <img src="https://img.icons8.com/?size=100&id=37924&format=png&color=000000" alt="">
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="toggleRenameListForm(taskList)">
+            <span>Rename</span>
+          </button>
+          <button mat-menu-item (click)="deleteTaskList(taskList.id)">
+            <span>Delete</span>
+          </button>
+        </mat-menu>
+      </div>
+      <div
+        cdkDropList
+        [id]="taskList.name"
+        [cdkDropListData]="taskList.tasks"
+        [cdkDropListConnectedTo]="getConnectedListIds(taskList.id)"
+        class="task-list"
+        (cdkDropListDropped)="drop($event)"
+      >
+        @for (task of taskList.tasks; track task) {
+          <div class="task-card" cdkDrag (click)="toggleEditTaskForm(task)">
+            <div class="task-header">
+              <h5 class="task-name">{{ task.title }}</h5>
+                <button class='deleteTaskButton' (click)="deleteTask(task.id); $event.stopPropagation()">
+                  <img src="https://img.icons8.com/?size=100&id=68064&format=png&color=000000" height="15" width="15" alt="">
+                </button>
+            </div>
+            <p class="task-description">{{ task.description }}</p>
+          </div>
+        }
+        <button class="add-task-button" (click)="toggleCreateTaskForm(taskList)">+ Adicionar Tarefa</button>
+      </div>
+    </div>
+    <div class="create-list-container">
+      <button class="add-list-button" (click)="toggleCreateListForm()">+ Adicionar Lista</button>
     </div>
   </div>
+</div>
 
-  <div class="list-container">
-    <h2 class="list-title">Development</h2>
-    <div
-      cdkDropList
-      #inProgressList="cdkDropList"
-      [cdkDropListData]="inProgress"
-      [cdkDropListConnectedTo]="[todoList, doneList]"
-      class="task-list"
-      (cdkDropListDropped)="drop($event)"
-    >
-      @for (task of inProgress; track task) {
-        <div class="task-card" cdkDrag>
-          <h3 class="task-title">{{ task.title }}</h3>
-          <p class="task-description">{{ task.description }}</p>
-        </div>
-      }
-      <button class="add-task-button" (click)="addTask('inProgress')">+ Adicionar Tarefa</button>
-    </div>
+<div *ngIf="showCreateTaskForm" class="overlay" (click)="toggleCreateTaskForm()"></div>
+<div *ngIf="showCreateTaskForm" class="create-task-form" style="margin-top: 10px;">
+  <h3>Criar Nova Tarefa</h3>
+  <input
+    type="text"
+    placeholder="Título da Tarefa"
+    [(ngModel)]="newTaskTitle"
+    class="form-input"
+  />
+  <input
+    type="date"
+    placeholder="Vencimento"
+    [(ngModel)]="newTaskDueDate"
+    class="form-input"
+  />
+  <textarea
+    placeholder="Descrição (opcional)"
+    [(ngModel)]="newTaskDescription"
+    class="form-textarea"
+  ></textarea>
+  <div class="form-actions">
+    <button (click)="createTask(selectedList)" class="form-submit-button">Criar</button>
+    <button (click)="toggleCreateTaskForm()" class="form-cancel-button">Cancelar</button>
   </div>
+</div>
 
-  <div class="list-container">
-    <h2 class="list-title">Done</h2>
-    <div
-      cdkDropList
-      #doneList="cdkDropList"
-      [cdkDropListData]="done"
-      [cdkDropListConnectedTo]="[todoList, inProgressList]"
-      class="task-list"
-      (cdkDropListDropped)="drop($event)"
-    >
-      @for (task of done; track task) {
-        <div class="task-card" cdkDrag>
-          <h3 class="task-title">{{ task.title }}</h3>
-          <p class="task-description">{{ task.description }}</p>
-        </div>
-      }
-      <button class="add-task-button" (click)="addTask('done')">+ Adicionar Tarefa</button>
-    </div>
+<div *ngIf="showCreateListForm" class="overlay" (click)="toggleCreateListForm()"></div>
+<div *ngIf="showCreateListForm" class="create-list-form">
+  <h3>Criar Nova Lista</h3>
+  <input
+    type="text"
+    placeholder="Nome da Lista"
+    [(ngModel)]="newListName"
+    class="form-input"
+  />
+  <div class="form-actions">
+    <button (click)="createTaskList()" class="form-submit-button">Criar</button>
+    <button (click)="toggleCreateListForm()" class="form-cancel-button">Cancelar</button>
+  </div>
+</div>
+
+<div *ngIf="showRenameListForm" class="overlay" (click)="toggleRenameListForm()"></div>
+<div *ngIf="showRenameListForm" class="create-list-form">
+  <h3>Renomear Lista</h3>
+  <input
+    type="text"
+    placeholder="Novo Nome da Lista"
+    [(ngModel)]="renameListName"
+    class="form-input"
+  />
+  <div class="form-actions">
+    <button (click)="renameTaskList()" class="form-submit-button">Salvar</button>
+    <button (click)="toggleRenameListForm()" class="form-cancel-button">Cancelar</button>
+  </div>
+</div>
+
+<div *ngIf="showRenameBoardForm" class="overlay" (click)="toggleRenameBoardForm()"></div>
+<div *ngIf="showRenameBoardForm" class="create-list-form">
+  <h3>Renomear Board</h3>
+  <input
+    type="text"
+    placeholder="Novo Nome do Board"
+    [(ngModel)]="renameBoardName"
+    class="form-input"
+  />
+  <div class="form-actions">
+    <button (click)="renameBoard()" class="form-submit-button">Salvar</button>
+    <button (click)="toggleRenameBoardForm()" class="form-cancel-button">Cancelar</button>
+  </div>
+</div>
+
+<div *ngIf="showEditTaskForm" class="overlay" (click)="toggleEditTaskForm()"></div>
+<div *ngIf="showEditTaskForm && editTask" class="edit-task-form">
+  <h3>Editar Tarefa</h3>
+  <input
+    type="text"
+    placeholder="Título da Tarefa"
+    [(ngModel)]="editTask.title"
+    class="form-input"
+  />
+  <textarea
+    placeholder="Descrição"
+    [(ngModel)]="editTask.description"
+    class="form-textarea"
+  ></textarea>
+  <select [(ngModel)]="selectedCategory" class="form-select">
+    <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+  </select>
+  <input
+    type="date"
+    [(ngModel)]="dueDate"
+    class="form-input"
+  />
+  <div class="form-actions">
+    <button (click)="saveTaskChanges()" class="form-submit-button">Salvar</button>
+    <button (click)="toggleEditTaskForm()" class="form-cancel-button">Cancelar</button>
   </div>
 </div>

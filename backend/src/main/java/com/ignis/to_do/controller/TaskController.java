@@ -1,6 +1,5 @@
 package com.ignis.to_do.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +27,9 @@ public class TaskController {
     }
 
     @PostMapping("/createTask")
-    public ResponseEntity<String> createTask(@Valid @RequestBody TaskDTO taskDTO) {
-        String response = taskService.createTask(taskDTO);
-        return ResponseEntity.ok(response);
+    public void createTask(@Valid @RequestBody TaskDTO taskDTO) {
+        taskService.createTask(taskDTO);
+        
     }
 
     @GetMapping("/getTask/{taskId}")
@@ -43,7 +42,13 @@ public class TaskController {
     public Iterable<TaskDTO> getAllTasks() {
 
         return taskService.getAllTasks();
-    }   
+    }  
+    
+    @GetMapping("/taskByTaskListId/{taskListId}")
+    public Iterable<TaskDTO> getTasksByTaskListId(@PathVariable Long taskListId) {
+        
+        return taskService.getTasksByTaskListId(taskListId);
+    }
     
     @PutMapping("/updateTaskTitle")
     public TaskDTO updateTaskTitle(

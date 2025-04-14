@@ -2,6 +2,8 @@ package com.ignis.to_do.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +42,7 @@ public class UserController {
     public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
         
         boolean isValid = userValidator.validateUser(
-            userDTO.getName(), userDTO.getEmail(), userDTO.getPassword());
+           userDTO.getEmail(), userDTO.getPassword());
         
         if (isValid) {
             return ResponseEntity.ok("Logado com sucesso");
@@ -78,5 +80,12 @@ public class UserController {
     public void deleteUserById(@PathVariable long userId) {
         
         userService.deleteUserById(userId);
+    }
+
+    @PostMapping("/jwtTeste")
+    public String getTarefas() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String usuarioLogado = authentication.getName();
+        return "Usuário autenticado: " + usuarioLogado;
     }
 }

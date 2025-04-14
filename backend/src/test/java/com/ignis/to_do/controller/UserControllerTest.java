@@ -57,7 +57,7 @@ class UserControllerTest {
     @Test
     void testLogin() throws Exception {
 
-        when(userValidator.validateUser("João", "joao@email.com", "senha123")).thenReturn(true);
+        when(userValidator.validateUser("joao@email.com", "senha123")).thenReturn(true);
 
         mockMvc.perform(post("/users/login")
                             .contentType("application/json")
@@ -65,6 +65,6 @@ class UserControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().string("Logado com sucesso"));
 
-        verify(userValidator, times(1)).validateUser("João", "joao@email.com", "senha123");
+        verify(userValidator, times(1)).validateUser("joao@email.com", "senha123");
     }
 }
