@@ -21,7 +21,6 @@ export class LoginService {
   }
 
   clearLocalStorage(): void {
-    debugger;
     localStorage.removeItem('jwtToken');
     localStorage.removeItem('ownerId');
   }
