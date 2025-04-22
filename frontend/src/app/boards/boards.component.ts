@@ -1,4 +1,5 @@
 import { Component, OnInit, inject} from '@angular/core';
+import {CdkDrag} from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule,Router } from '@angular/router';
@@ -13,12 +14,14 @@ interface Board {
   ownerId: string;
   title: string;
   description?: string;
+  favorite?: boolean;
 }
 
 @Component({
   selector: 'app-boards',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatButtonModule, MatMenuModule, MatSidenavModule],
+  imports: [CommonModule, FormsModule, RouterModule, MatButtonModule, MatMenuModule,
+             MatSidenavModule, CdkDrag],
   providers: [
     {
       provide: 'HTTP_INTERCEPTORS',
@@ -35,6 +38,7 @@ export class BoardsComponent implements OnInit {
   showCreateForm: boolean = false;
   newBoardTitle: string = '';
   newBoardDescription: string = '';
+  private isDragging = false;
 
   private readonly boardService=inject(BoardService);
   private readonly router=inject(Router);
@@ -78,6 +82,15 @@ export class BoardsComponent implements OnInit {
     this.newBoardDescription = '';
   }
 
+  toggleFavorite(boardId: string, event: Event): void {
+    event.stopPropagation(); 
+    const board = this.boards.find(b => b.id === boardId);
+    if (board) {
+      board.favorite = !board.favorite; 
+      this.boardService.toggleFavorite(boardId);
+    }
+  }
+
   createBoard(): void {
     const ownerId = this.boardService.getOwnerId();
     if (!this.newBoardTitle.trim()) {
@@ -110,6 +123,20 @@ export class BoardsComponent implements OnInit {
   goToBoard(board: Board) : void { 
     this.router.navigate(['/main'], { queryParams: { boardId: board.id } });
 
+  }
+
+  onDragStart(): void {
+    this.isDragging = true;
+  }
+
+  onDragEnd(): void {
+    setTimeout(() => this.isDragging = false, 0); // Reset after drag ends
+  }
+
+  onBoardClick(event: MouseEvent, board: Board): void {
+    if (!this.isDragging) { // Navigate only if not dragging
+      this.goToBoard(board);
+    }
   }
 }
 

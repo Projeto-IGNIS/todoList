@@ -53,4 +53,10 @@ export class BoardService {
   deleteBoard(id: string): Observable<string> {
     return this.http.delete(this.buildUrl(`deleteBoard/${id}`), { responseType: 'text' });
   }
+
+  toggleFavorite(id: string): void {
+
+    const headers = this.getAuthenticatedHeaders();
+    this.http.put(this.buildUrl(`toggleFavorite/${id}`), null, { headers }).subscribe();
+  }
 }
