@@ -1,39 +1,51 @@
 package com.ignis.to_do.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 //import com.ignis.to_do.dto.NotificationDTO;
 import com.ignis.to_do.dto.TaskDTO;
 import com.ignis.to_do.model.Notification;
 import com.ignis.to_do.model.Task;
 import com.ignis.to_do.model.User;
+import com.ignis.to_do.repository.NotificationRepository;
+import com.ignis.to_do.repository.TaskRepository;
 
 @Service
 public class NotificationService {
-   private TaskService taskService;
-  // private NotificationDTO notificationDTO;
+  
+    private final NotificationRepository notificationRepository = null;
+    private final TaskRepository taskRepository = null;
+    private final TaskService taskService = null;
 
-   public NotificationService(TaskService taskService) {
-          this.taskService = taskService;
-   }
+   public String createNotification(Long userId, String message, Long taskId){
+          Task task = taskRepository.findById(taskId)
+               .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+          Notification notification = Notification.builder()
+                .message(message)
+                .read(false)
+                .userId(userId)
+                .task(task)
+                .build();
 
-   public String createNotification(Task task , User user){
-
-          Notification notification = new Notification(user, task, "Task " + task.getTitle() + " is overdue", false);
-          
-          return notification.toString(); 
+        notificationRepository.save(notification);
 
    }
    
-   public void sendNotification(Notification notification, User user){
-        //TO DO
+   public void sendNotification(Long userId, Long taskId) {
+        //
    }
 
-   public void getNotificationsByUser(User user){
-         //TO DO
+   public void getNotificationsByUser(Long userId){
+         return;
    }
 
-   public void deleteNotification(Notification notification){
-        //TO DO
+   public List<Notification> getNotifications(Long userId) {
+        return notificationRepository.findByUserId(userId);
+   }
+
+   public void deleteNotification(Long notificationId){
+        notificationRepository.deleteById(notificationId);
    }
 
    public String getTasksToNotify(){
@@ -45,9 +57,11 @@ public class NotificationService {
 
    }
 
-   public String markNotificationAsRead(Notification notification){
-        notification.setRead(true);
-     return "Notification marked as read";
+   public void markNotificationAsRead(Long notificationId) {
+          Notification notification = notificationRepository.findById(notificationId)
+               .orElseThrow(() -> new RuntimeException("Notificação não encontrada"));
+          notification.setRead(true);
+          notificationRepository.save(notification);
    }
 
 }

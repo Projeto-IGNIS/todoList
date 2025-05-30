@@ -35,6 +35,7 @@ public class TaskService implements TaskReminder {
             Task task = new Task(taskDTO.getTitle(), taskList, taskDTO.getDescription(), taskDTO.getStatus(), taskDTO.getDueDate());      
             taskRepository.save(task);        
             return "Task criada com sucesso";
+            
         }
 
         return "Status inválido";
