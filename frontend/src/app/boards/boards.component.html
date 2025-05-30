@@ -1,5 +1,3 @@
-
-
 <div class="boards-page">
 
   <div>
@@ -41,18 +39,25 @@
   </header>
 
   <div class="boards-container">
-    <div *ngFor="let board of boards" class="board-card" (click)="goToBoard(board)">
-      <div class="board-title-container">
+    <div *ngFor="let board of boards" class="board-card" cdkDrag>
+      <div class="board-title-container" (click)="onBoardClick($event, board)">
         <h3 class="board-title">{{ board.title }}</h3>  
         <div class="board-actions">
-          <button class="favorite-button">★</button>
+          <button 
+            class="favorite-button" 
+            (click)="toggleFavorite(board.id, $event)">
+            <img 
+              [src]="board.favorite 
+                ? 'https://img.icons8.com/?size=100&id=85135&format=png&color=000000' 
+                : 'https://img.icons8.com/?size=100&id=85033&format=png&color=000000'" 
+              class="favorite-icon" width="20" height="20"
+              alt="Favorite Icon"/>
+          </button>
           <button class="delete-button" (click)="deleteBoard(board.id)">
-            <img src="https://img.icons8.com/?size=100&id=G01ACMKXfdpJ&format=png&color=000000"  class="delete-icon" alt="Delete Icon"/>
+            <img src="https://img.icons8.com/?size=100&id=G01ACMKXfdpJ&format=png&color=000000" class="delete-icon" alt="Delete Icon"/>
           </button>
         </div>
-
       </div>
-
     </div>
   </div>
 </div>
