@@ -10,7 +10,7 @@ public class EnvConfig {
     @Bean
     Dotenv dotenv() {
         return Dotenv.configure()
-                .ignoreIfMissing().directory(System.getProperty("user.dir")+"/backend")
+                .directory(System.getProperty("user.dir"))
                 .load();
     }
 }

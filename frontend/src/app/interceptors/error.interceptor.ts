@@ -13,6 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       let errorMessage = 'Ocorreu um erro. Tente novamente.';
+      let showNotification = true;
 
       if (error.error instanceof ErrorEvent) {
         // Erro do lado do cliente
@@ -24,9 +25,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             errorMessage = 'Requisição inválida. Verifique os dados enviados.';
             break;
           case 401:
-            errorMessage = 'Sessão expirada. Faça login novamente.';
+            // Apenas mostra mensagem se for erro de autenticação em requisição (não no guard)
+            if (req.url.includes('/login') || authService.isAuthenticated()) {
+              errorMessage = 'Credenciais inválidas ou sessão expirada.';
+            } else {
+              showNotification = false; // Não mostra notificação em redirecionamentos do guard
+            }
             authService.logout();
-            router.navigate(['/login']);
+            router.navigate(['/login'], { replaceUrl: true });
             break;
           case 404:
             errorMessage = 'Recurso não encontrado.';
@@ -39,7 +45,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      notificationService.showError(errorMessage);
+      if (showNotification) {
+        notificationService.showError(errorMessage);
+      }
       return throwError(() => error);
     })
   );

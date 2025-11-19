@@ -10,6 +10,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  router.navigate(['/login']);
+  // Redireciona silenciosamente para login sem mostrar mensagem de erro
+  router.navigate(['/login'], { replaceUrl: true });
   return false;
 };
