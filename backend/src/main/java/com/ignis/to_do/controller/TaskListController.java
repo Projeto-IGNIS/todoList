@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ignis.to_do.dto.TaskListDTO;
 import com.ignis.to_do.service.TaskListService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/taskList")
@@ -25,7 +26,7 @@ public class TaskListController {
     
     @PostMapping("/createTaskList")
     public TaskListDTO createTaskList(
-        @RequestBody TaskListDTO taskListDTO) {      
+        @Valid @RequestBody TaskListDTO taskListDTO) {      
 
         return taskListService.createTaskList(taskListDTO);
     }

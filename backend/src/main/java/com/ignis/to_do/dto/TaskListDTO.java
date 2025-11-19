@@ -1,5 +1,6 @@
 package com.ignis.to_do.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TaskListDTO {
     private Long id;
-    private String name;
+    @NotNull(message = "Name cannot be null")
+    private String title;
     private Long boardId;
 }

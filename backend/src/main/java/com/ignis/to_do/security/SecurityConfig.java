@@ -27,7 +27,7 @@ public class SecurityConfig{
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/users/createUser").permitAll()
-                .requestMatchers("/users/**", "/board/**").authenticated()
+                .requestMatchers("/users/**", "/board/**", "/taskList/**", "/task/**").authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         

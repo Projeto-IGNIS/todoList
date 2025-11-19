@@ -25,12 +25,12 @@ public class TaskListService {
     }
     
     public TaskListDTO createTaskList(TaskListDTO taskListDTO) {
-        if (taskListRepository.findByName(taskListDTO.getName()).isPresent()) {
-            throw new TaskListAlreadyExistsException(TASK_LIST_ALREADY_EXISTS.formatted(taskListDTO.getName()));
+        if (taskListRepository.findByName(taskListDTO.getTitle()).isPresent()) {
+            throw new TaskListAlreadyExistsException(TASK_LIST_ALREADY_EXISTS.formatted(taskListDTO.getTitle()));
         }
 
         Board board = boardService.getBoard(taskListDTO.getBoardId());
-        TaskList taskList = new TaskList(taskListDTO.getName(), board);
+        TaskList taskList = new TaskList(taskListDTO.getTitle(), board);
         return new TaskListDTO(taskListRepository.save(taskList).getId(), taskList.getName(), 
             taskList.getBoard().getId());
     }
@@ -69,8 +69,8 @@ public class TaskListService {
     @Transactional
     public TaskListDTO updateTaskListTitle(TaskListDTO taskListDTO) {
 
-        taskListRepository.updateTaskListTitle(taskListDTO.getId(), taskListDTO.getName());
-        return new TaskListDTO(taskListDTO.getId(), taskListDTO.getName(), 
+        taskListRepository.updateTaskListTitle(taskListDTO.getId(), taskListDTO.getTitle());
+        return new TaskListDTO(taskListDTO.getId(), taskListDTO.getTitle(), 
                                 taskListRepository.findById(taskListDTO.getId()).orElseThrow(() -> 
                                 new TaskListNotFoundException(TASK_LIST_NOT_FOUND.formatted(taskListDTO.getId()))).getBoard().getId());
     }
