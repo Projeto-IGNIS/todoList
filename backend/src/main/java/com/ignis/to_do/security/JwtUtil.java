@@ -1,6 +1,5 @@
 package com.ignis.to_do.security;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -14,14 +13,12 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final Dotenv dotenv;
-
-    public JwtUtil(Dotenv dotenv) {
-        this.dotenv = dotenv;
-    }
-
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(dotenv.get("JWT_SECRET_KEY").getBytes());
+        String secret = System.getenv("JWT_SECRET_KEY");
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET_KEY environment variable is not set or too short");
+        }
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(UserDTO userDTO) {
@@ -29,11 +26,17 @@ public class JwtUtil {
         String email = userDTO.getEmail();
         String password = userDTO.getPassword();
         
+        String expirationTimeStr = System.getenv("EXPIRATION_TIME");
+        if (expirationTimeStr == null) {
+            throw new IllegalStateException("EXPIRATION_TIME environment variable is not set");
+        }
+        long expirationTime = Long.parseLong(expirationTimeStr);
+        
         return Jwts.builder()
                 .setSubject(email)
                 .setSubject(password)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(dotenv.get("EXPIRATION_TIME"))))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
