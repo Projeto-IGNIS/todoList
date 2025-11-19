@@ -1,0 +1,319 @@
+<div class="task-list-view">
+  <!-- Header com título do board e controles -->
+  <div class="view-header">
+    <div class="header-title">
+      <h1>{{ board.title }}</h1>
+      <button
+        class="btn-favorite"
+        [class.active]="board.favorite"
+        title="Favoritar board"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" [attr.fill]="board.favorite ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Barra de ferramentas -->
+    <div class="toolbar">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar tarefas..."
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+
+      <div class="filter-controls">
+        <select [(ngModel)]="filterStatus" class="filter-select">
+          <option value="ALL">Todas</option>
+          <option [value]="TaskStatus.PENDING">Pendentes</option>
+          <option [value]="TaskStatus.IN_PROGRESS">Em Progresso</option>
+          <option [value]="TaskStatus.COMPLETED">Concluídas</option>
+        </select>
+
+        <select [(ngModel)]="sortBy" class="filter-select">
+          <option value="dueDate">Data de vencimento</option>
+          <option value="title">Título</option>
+          <option value="status">Status</option>
+        </select>
+      </div>
+
+      <button class="btn-add-list" (click)="openCreateListModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nova Lista
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Carregando tarefas...</p>
+  </div>
+
+  <!-- Task Lists -->
+  <div *ngIf="!isLoading" class="task-lists-container">
+    <div *ngIf="taskLists.length === 0" class="empty-board">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+      </svg>
+      <h2>Nenhuma lista criada</h2>
+      <p>Crie sua primeira lista de tarefas para começar!</p>
+      <button class="btn-primary" (click)="openCreateListModal()">Criar Lista</button>
+    </div>
+
+    <div class="task-lists-grid">
+      <div *ngFor="let list of taskLists" class="task-list-card">
+        <!-- List Header -->
+        <div class="list-header">
+          <div class="list-title-section">
+            <h3>{{ list.title }}</h3>
+            <span class="task-counter">{{ getTaskCounters(list.id!).completed }} / {{ getTaskCounters(list.id!).total }}</span>
+          </div>
+          <div class="list-actions">
+            <button class="btn-icon-small" (click)="openCreateTaskModal(list.id!)" title="Adicionar tarefa">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+            <button class="btn-icon-small delete" (click)="deleteTaskList(list.id!)" title="Excluir lista">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            [style.width.%]="getTaskCounters(list.id!).total > 0 ? (getTaskCounters(list.id!).completed / getTaskCounters(list.id!).total * 100) : 0"
+          ></div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="tasks-list">
+          <div *ngIf="getFilteredTasks(list.id!).length === 0" class="empty-list">
+            <p>Nenhuma tarefa encontrada</p>
+          </div>
+
+          <div
+            *ngFor="let task of getFilteredTasks(list.id!)"
+            class="task-item"
+            [class.completed]="task.status === TaskStatus.COMPLETED"
+            [class.overdue]="isOverdue(task)"
+          >
+            <div class="task-checkbox">
+              <input
+                type="checkbox"
+                [checked]="task.status === TaskStatus.COMPLETED"
+                (change)="toggleTaskStatus(task)"
+                [id]="'task-' + task.id"
+              />
+              <label [for]="'task-' + task.id"></label>
+            </div>
+
+            <div class="task-content" (click)="openEditTaskModal(task)" role="button" tabindex="0" (keydown.enter)="openEditTaskModal(task)">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-meta">
+                <span *ngIf="task.description" class="task-description">{{ task.description }}</span>
+                <span *ngIf="task.dueDate" class="task-date" [class.overdue]="isOverdue(task)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  {{ formatDate(task.dueDate) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="task-actions">
+              <button class="btn-icon-tiny" (click)="openEditTaskModal(task)" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="btn-icon-tiny delete" (click)="deleteTask(task.id!)" title="Excluir">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create List -->
+  <div class="modal-overlay" *ngIf="showCreateListModal" (click)="closeCreateListModal()" role="button" tabindex="0" (keydown.escape)="closeCreateListModal()">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" tabindex="0">
+      <div class="modal-header">
+        <h3>Nova Lista de Tarefas</h3>
+        <button class="btn-icon" (click)="closeCreateListModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="listTitle">Título da Lista</label>
+          <input
+            type="text"
+            id="listTitle"
+            [(ngModel)]="newListTitle"
+            placeholder="Ex: Tarefas da semana, Prioridades..."
+            (keyup.enter)="createTaskList()"
+            autofocus
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeCreateListModal()">Cancelar</button>
+        <button class="btn-primary" (click)="createTaskList()" [disabled]="!newListTitle.trim()">
+          Criar Lista
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create Task -->
+  <div class="modal-overlay" *ngIf="showCreateTaskModal" (click)="closeCreateTaskModal()" role="button" tabindex="0" (keydown.escape)="closeCreateTaskModal()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()" role="dialog" tabindex="0">
+      <div class="modal-header">
+        <h3>Nova Tarefa</h3>
+        <button class="btn-icon" (click)="closeCreateTaskModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="taskTitle">Título *</label>
+          <input
+            type="text"
+            id="taskTitle"
+            [(ngModel)]="newTask.title"
+            placeholder="Digite o título da tarefa"
+            autofocus
+          />
+        </div>
+        <div class="form-group">
+          <label for="taskDescription">Descrição</label>
+          <textarea
+            id="taskDescription"
+            [(ngModel)]="newTask.description"
+            placeholder="Adicione detalhes sobre a tarefa..."
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskStatus">Status</label>
+            <select id="taskStatus" [(ngModel)]="newTask.status">
+              <option [value]="TaskStatus.PENDING">Pendente</option>
+              <option [value]="TaskStatus.IN_PROGRESS">Em Progresso</option>
+              <option [value]="TaskStatus.COMPLETED">Concluída</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="taskDueDate">Data de Vencimento</label>
+            <input
+              type="date"
+              id="taskDueDate"
+              [(ngModel)]="newTask.dueDate"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeCreateTaskModal()">Cancelar</button>
+        <button class="btn-primary" (click)="createTask()" [disabled]="!newTask.title.trim()">
+          Criar Tarefa
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Task -->
+  <div class="modal-overlay" *ngIf="showEditTaskModal" (click)="closeEditTaskModal()" role="button" tabindex="0" (keydown.escape)="closeEditTaskModal()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()" role="dialog" tabindex="0">
+      <div class="modal-header">
+        <h3>Editar Tarefa</h3>
+        <button class="btn-icon" (click)="closeEditTaskModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="editTaskTitle">Título *</label>
+          <input
+            type="text"
+            id="editTaskTitle"
+            [(ngModel)]="editingTask.title"
+            placeholder="Digite o título da tarefa"
+          />
+        </div>
+        <div class="form-group">
+          <label for="editTaskDescription">Descrição</label>
+          <textarea
+            id="editTaskDescription"
+            [(ngModel)]="editingTask.description"
+            placeholder="Adicione detalhes sobre a tarefa..."
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editTaskStatus">Status</label>
+            <select id="editTaskStatus" [(ngModel)]="editingTask.status">
+              <option [value]="TaskStatus.PENDING">Pendente</option>
+              <option [value]="TaskStatus.IN_PROGRESS">Em Progresso</option>
+              <option [value]="TaskStatus.COMPLETED">Concluída</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editTaskDueDate">Data de Vencimento</label>
+            <input
+              type="date"
+              id="editTaskDueDate"
+              [(ngModel)]="editingTask.dueDate"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeEditTaskModal()">Cancelar</button>
+        <button class="btn-primary" (click)="updateTask()" [disabled]="!editingTask.title.trim()">
+          Salvar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

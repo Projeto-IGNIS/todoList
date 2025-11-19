@@ -1,49 +1,51 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-
-interface Board {
-  id: string;
-  ownerId: string;
-  title: string;
-}
+import { Board, CreateBoardRequest } from '../models/board.model';
+import { TaskList } from '../models/task-list.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class BoardService {
-  private readonly baseUrl = 'http://localhost:8080/board';
+  private readonly API_URL = `${environment.apiUrl}/board`;
 
-  private readonly http=inject(HttpClient);
+  constructor(private http: HttpClient) {}
 
+  createBoard(board: CreateBoardRequest): Observable<Board> {
+    return this.http.post<Board>(`${this.API_URL}/createBoard`, board);
+  }
+
+  getBoard(boardId: number): Observable<Board> {
+    return this.http.get<Board>(`${this.API_URL}/getBoard/${boardId}`);
+  }
 
   getAllBoards(): Observable<Board[]> {
-    const ownerId = localStorage.getItem('ownerId');
-    return this.http.get<Board[]>(`${this.baseUrl}/myBoards/${ownerId}`);
+    return this.http.get<Board[]>(`${this.API_URL}/allBoards`);
   }
 
-  getOwnerId(): string | null {
-    const ownerId = localStorage.getItem('ownerId');
-    return ownerId;
+  getMyBoards(ownerId: number): Observable<Board[]> {
+    return this.http.get<Board[]>(`${this.API_URL}/myBoards/${ownerId}`);
   }
 
-  createBoard(board: Board): Observable<Board> {
-    return this.http.post<Board>(this.baseUrl + "/createBoard", board);
+  isFavorite(boardId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/isFavorite/${boardId}`);
   }
 
-  deleteBoard(id: string): Observable<string> {
-    return this.http.delete(this.baseUrl + "/deleteBoard/" + id, { responseType: 'text' });
-  }
-  
-  getToken(): string | null {
-    return localStorage.getItem('jwtToken');
+  getTaskListsByBoard(boardId: number): Observable<TaskList[]> {
+    return this.http.get<TaskList[]>(`${this.API_URL}/myTasksByBoard/${boardId}`);
   }
 
-  getAuthenticatedHeaders(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
+  updateBoardTitle(board: Board): Observable<Board> {
+    return this.http.put<Board>(`${this.API_URL}/updateBoardTitle`, board);
+  }
+
+  toggleFavorite(boardId: number): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/toggleFavorite/${boardId}`, {});
+  }
+
+  deleteBoard(boardId: number): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/deleteBoard/${boardId}`);
   }
 }
