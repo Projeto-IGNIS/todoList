@@ -27,12 +27,14 @@ export class TaskListViewComponent implements OnChanges {
   showCreateListModal = false;
   showCreateTaskModal = false;
   showEditTaskModal = false;
+  showEditListModal = false;
   
   newListTitle = '';
   selectedListId: number | null = null;
   
   newTask: Task = this.getEmptyTask();
   editingTask: Task = this.getEmptyTask();
+  editingList: TaskList = this.getEmptyList();
   
   searchQuery = '';
   filterStatus: 'ALL' | TaskStatus = 'ALL';
@@ -112,6 +114,31 @@ export class TaskListViewComponent implements OnChanges {
       next: () => {
         this.notificationService.showSuccess('Lista criada com sucesso!');
         this.closeCreateListModal();
+        this.loadTaskLists();
+      }
+    });
+  }
+
+  openEditListModal(list: TaskList): void {
+    this.editingList = { ...list };
+    this.showEditListModal = true;
+  }
+
+  closeEditListModal(): void {
+    this.showEditListModal = false;
+    this.editingList = this.getEmptyList();
+  }
+
+  updateTaskList(): void {
+    if (!this.editingList.title.trim()) {
+      this.notificationService.showWarning('Digite um título para a lista');
+      return;
+    }
+
+    this.taskListService.updateTaskList(this.editingList).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Lista atualizada com sucesso!');
+        this.closeEditListModal();
         this.loadTaskLists();
       }
     });
@@ -202,7 +229,7 @@ export class TaskListViewComponent implements OnChanges {
     const updatedTask = { ...task };
     updatedTask.status = task.status === TaskStatus.COMPLETED ? TaskStatus.PENDING : TaskStatus.COMPLETED;
 
-    this.taskService.updateTaskTitle(updatedTask).subscribe({
+    this.taskService.updateTaskStatus(updatedTask).subscribe({
       next: () => {
         this.loadAllTasks();
       }
@@ -228,17 +255,28 @@ export class TaskListViewComponent implements OnChanges {
     } else {
       const task = event.previousContainer.data[event.previousIndex];
       const newListId = parseInt(event.container.id.replace('cdk-drop-list-', ''));
+
+      // Otimistic update: move the task in UI first
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+
+      // Then update the backend
       this.taskService.updateTaskList(task.id!, newListId).subscribe({
         next: () => {
-          transferArrayItem(
-            event.previousContainer.data,
-            event.container.data,
-            event.previousIndex,
-            event.currentIndex,
-          );
           this.notificationService.showSuccess('Tarefa movida com sucesso!');
         },
         error: () => {
+          // Revert the UI change if API call fails
+          transferArrayItem(
+            event.container.data,
+            event.previousContainer.data,
+            event.currentIndex,
+            event.previousIndex,
+          );
           this.notificationService.showError('Erro ao mover tarefa');
         }
       });
@@ -289,6 +327,10 @@ export class TaskListViewComponent implements OnChanges {
     });
   }
 
+  hasActiveFilters(): boolean {
+    return this.searchQuery.trim() !== '' || this.filterStatus !== 'ALL';
+  }
+
   getTaskCounters(listId: number) {
     const allTasks = this.tasks[listId] || [];
     return {
@@ -320,6 +362,13 @@ export class TaskListViewComponent implements OnChanges {
       status: TaskStatus.PENDING,
       listId: 0,
       dueDate: null
+    };
+  }
+
+  private getEmptyList(): TaskList {
+    return {
+      title: '',
+      boardId: 0
     };
   }
 }

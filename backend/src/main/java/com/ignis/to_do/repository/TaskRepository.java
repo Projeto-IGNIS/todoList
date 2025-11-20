@@ -15,6 +15,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     void updateTaskTitle(@Param("id") Long id, @Param("title") String title);
 
     @Modifying
+    @Query("UPDATE task tk SET tk.status = :status WHERE tk.id = :id")
+    void updateTaskStatus(@Param("id") Long id, @Param("status") String status);
+
+    @Modifying
     @Query("UPDATE task tk SET tk.list.id = :listId WHERE tk.id = :id")
     void updateTaskList(@Param("id") Long id, @Param("listId") Long listId);
 }   

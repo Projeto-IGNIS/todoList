@@ -52,6 +52,13 @@ public class TaskController {
         return taskService.updateTaskTitle(taskDTO);
     }
 
+    @PutMapping("/updateTaskStatus")
+    public TaskDTO updateTaskStatus(
+        @RequestBody TaskDTO taskDTO) {
+            
+        return taskService.updateTaskStatus(taskDTO);
+    }
+
     @PutMapping("/updateTaskList/{taskId}/{listId}")
     public TaskDTO updateTaskList(@PathVariable Long taskId, @PathVariable Long listId) {
         return taskService.updateTaskList(taskId, listId);

@@ -49,6 +49,23 @@
   color: #fbbf24;
 }
 
+.filter-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 0.375rem;
+  color: #92400e;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.filter-warning svg {
+  flex-shrink: 0;
+}
+
 .toolbar {
   display: flex;
   gap: 1rem;
@@ -713,6 +730,10 @@
 .task-item {
   cursor: grab;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-item[cdkDragDisabled="true"] {
+  cursor: not-allowed;
 }
 
 .task-item:active {

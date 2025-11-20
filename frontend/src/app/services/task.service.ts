@@ -28,6 +28,10 @@ export class TaskService {
     return this.http.put<Task>(`${this.API_URL}/updateTaskTitle`, task);
   }
 
+  updateTaskStatus(task: Task): Observable<Task> {
+    return this.http.put<Task>(`${this.API_URL}/updateTaskStatus`, task);
+  }
+
   updateTaskList(taskId: number, listId: number): Observable<Task> {
     return this.http.put<Task>(`${this.API_URL}/updateTaskList/${taskId}/${listId}`, {});
   }
