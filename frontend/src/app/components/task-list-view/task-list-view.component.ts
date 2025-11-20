@@ -34,6 +34,7 @@ export class TaskListViewComponent implements OnChanges {
   
   newTask: Task = this.getEmptyTask();
   editingTask: Task = this.getEmptyTask();
+  originalTask: Task = this.getEmptyTask();
   editingList: TaskList = this.getEmptyList();
   
   searchQuery = '';
@@ -196,6 +197,7 @@ export class TaskListViewComponent implements OnChanges {
   }
 
   openEditTaskModal(task: Task): void {
+    this.originalTask = { ...task };
     this.editingTask = { ...task };
     // Converter data para formato compatível com input date
     if (this.editingTask.dueDate) {
@@ -216,11 +218,35 @@ export class TaskListViewComponent implements OnChanges {
       return;
     }
 
+    // Convert dueDate back to Date if it's a string
+    if (typeof this.editingTask.dueDate === 'string') {
+      this.editingTask.dueDate = this.editingTask.dueDate ? new Date(this.editingTask.dueDate) : null;
+    }
+
     this.taskService.updateTaskTitle(this.editingTask).subscribe({
       next: () => {
-        this.notificationService.showSuccess('Tarefa atualizada com sucesso!');
-        this.closeEditTaskModal();
-        this.loadAllTasks();
+        // Check if status changed
+        if (this.editingTask.status !== this.originalTask.status) {
+          this.taskService.updateTaskStatus(this.editingTask).subscribe({
+            next: () => {
+              this.notificationService.showSuccess('Tarefa atualizada com sucesso!');
+              this.closeEditTaskModal();
+              this.loadAllTasks();
+            },
+            error: (err) => {
+              console.error('Erro ao atualizar status:', err);
+              this.notificationService.showError('Erro ao atualizar status da tarefa');
+            }
+          });
+        } else {
+          this.notificationService.showSuccess('Tarefa atualizada com sucesso!');
+          this.closeEditTaskModal();
+          this.loadAllTasks();
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar tarefa:', err);
+        this.notificationService.showError('Erro ao atualizar tarefa');
       }
     });
   }
@@ -353,6 +379,21 @@ export class TaskListViewComponent implements OnChanges {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR');
+  }
+
+  toggleFavorite(event: Event): void {
+    event.stopPropagation();
+    
+    if (!this.board.id) return;
+
+    this.boardService.toggleFavorite(this.board.id).subscribe({
+      next: () => {
+        this.board.favorite = !this.board.favorite;
+        this.notificationService.showSuccess(
+          this.board.favorite ? 'Adicionado aos favoritos' : 'Removido dos favoritos'
+        );
+      }
+    });
   }
 
   private getEmptyTask(): Task {

@@ -77,7 +77,7 @@ public class TaskService implements TaskReminder {
     @Transactional
     public TaskDTO updateTaskStatus(TaskDTO taskDTO) {
         verifyIfTaskExists(taskDTO.getId());
-        taskRepository.updateTaskStatus(taskDTO.getId(), taskDTO.getStatus().name());
+        taskRepository.updateTaskStatus(taskDTO.getId(), taskDTO.getStatus());
         return getTaskById(taskDTO.getId());
     }
 

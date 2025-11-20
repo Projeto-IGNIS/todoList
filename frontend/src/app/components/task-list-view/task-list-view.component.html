@@ -6,6 +6,7 @@
       <button
         class="btn-favorite"
         [class.active]="board.favorite"
+        (click)="toggleFavorite($event)"
         title="Favoritar board"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" [attr.fill]="board.favorite ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
