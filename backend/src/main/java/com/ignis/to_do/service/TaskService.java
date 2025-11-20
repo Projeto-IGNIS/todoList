@@ -19,31 +19,36 @@ public class TaskService implements TaskReminder {
 
     private final TaskRepository taskRepository;
     private final TaskListService taskListService;
+    private final CategoryService categoryService;
 
     private static final String TASK_NOT_FOUND = "Task com ID %s nao encontrado";
 
-    public TaskService(TaskRepository taskRepository, TaskListService taskListService) {
+    public TaskService(TaskRepository taskRepository, TaskListService taskListService, CategoryService categoryService) {
         this.taskRepository = taskRepository;
         this.taskListService = taskListService;
+        this.categoryService = categoryService;
     }
 
     public String createTask(TaskDTO taskDTO) {  
 
-        StatusValidator taskStatus = new StatusValidator(taskDTO.getStatus());
-        if (taskStatus.validateStatus(taskDTO.getStatus())) {            
+        StatusValidator taskStatus = new StatusValidator(taskDTO.getStatus().toString());
+        if (taskStatus.validateStatus(taskDTO.getStatus().toString())) {            
             TaskList taskList = taskListService.getList(taskDTO.getListId());        
             Task task = new Task(taskDTO.getTitle(), taskList, taskDTO.getStatus());      
+            task.setDescription(taskDTO.getDescription());
+            if (taskDTO.getCategoryId() != null) {
+                task.setCategory(categoryService.getCategoryById(taskDTO.getCategoryId()));
+            }
+            task.setDueDate(taskDTO.getDueDate());
             taskRepository.save(task);        
             return "Task criada com sucesso";
         }
 
         return "Status inválido";
-    }
-
-    public TaskDTO getTaskById(Long taskId) {  
+    }    public TaskDTO getTaskById(Long taskId) {  
         Task task = taskRepository.findById(taskId).orElseThrow(()
          -> new TaskNotFoundException(TASK_NOT_FOUND.formatted(taskId))); 
-        return new TaskDTO(task.getId(), task.getTitle(), task.getStatus(), task.getList().getId()); 
+        return new TaskDTO(task.getId(), task.getTitle(), task.getDescription(), task.getStatus(), task.getList().getId(), task.getCategory() != null ? task.getCategory().getId() : null, task.getDueDate()); 
     }
 
     public void verifyIfTaskExists(Long taskId) {
@@ -53,7 +58,7 @@ public class TaskService implements TaskReminder {
 
     public Iterable<TaskDTO> getAllTasks() {
         return taskRepository.findAll().stream()
-            .map(task -> new TaskDTO(task.getId(), task.getTitle(), task.getStatus(), task.getList().getId()))
+            .map(task -> new TaskDTO(task.getId(), task.getTitle(), task.getDescription(), task.getStatus(), task.getList().getId(), task.getCategory() != null ? task.getCategory().getId() : null, task.getDueDate()))
             .toList();
     }
     
@@ -67,6 +72,21 @@ public class TaskService implements TaskReminder {
 
         taskRepository.updateTaskTitle(taskDTO.getId(), taskDTO.getTitle());
         return getTaskById(taskDTO.getId());
+    }
+
+    @Transactional
+    public TaskDTO updateTaskStatus(TaskDTO taskDTO) {
+        verifyIfTaskExists(taskDTO.getId());
+        taskRepository.updateTaskStatus(taskDTO.getId(), taskDTO.getStatus());
+        return getTaskById(taskDTO.getId());
+    }
+
+    @Transactional
+    public TaskDTO updateTaskList(Long taskId, Long listId) {
+        verifyIfTaskExists(taskId);
+        taskListService.verifyIfTaskListExists(listId);
+        taskRepository.updateTaskList(taskId, listId);
+        return getTaskById(taskId);
     }
     
     @Override
@@ -87,6 +107,6 @@ public class TaskService implements TaskReminder {
 
     @Override
     public void sendTaskReminder() {
-    // TODO
+        // Implementation for sending reminder
     }
 }

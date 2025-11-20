@@ -14,7 +14,7 @@ import com.ignis.to_do.model.TaskList;
 @Repository
 public interface TaskListRepository extends JpaRepository<TaskList, Long>{
 
-    Optional<TaskList> findByName(String name);
+    Optional<TaskList> findByTitleAndBoardId(String title, Long boardId);
 
     @Modifying
     @Query("UPDATE task_list tl SET tl.board.id = :boardId WHERE tl.id = :id")
@@ -24,9 +24,9 @@ public interface TaskListRepository extends JpaRepository<TaskList, Long>{
         );
 
     @Modifying
-    @Query("UPDATE task_list tl SET tl.name = :name WHERE tl.id = :id")
+    @Query("UPDATE task_list tl SET tl.title = :title WHERE tl.id = :id")
     void updateTaskListTitle(
         @Param("id") Long id,
-        @Param("name") String name
+        @Param("title") String title
         );
 }

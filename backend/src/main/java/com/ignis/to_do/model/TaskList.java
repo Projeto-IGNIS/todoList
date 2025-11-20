@@ -2,6 +2,7 @@ package com.ignis.to_do.model;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,15 +23,16 @@ public class TaskList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name; 
+    @Column(name = "name")
+    private String title; 
     @ManyToOne
     @JoinColumn(name = "board_id")       
     private Board board;
     @OneToMany(mappedBy = "list")
     private List<Task> tasks;
 
-    public TaskList(String name, Board board) {
-        this.name = name;
+    public TaskList(String title, Board board) {
+        this.title = title;
         this.board = board;
     }
 

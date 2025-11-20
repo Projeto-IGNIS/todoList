@@ -13,7 +13,7 @@ import com.ignis.to_do.model.Board;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    Optional<Board> findByTitle(String title);
+    Optional<Board> findByTitleAndOwnerId(String title, Long ownerId);
     @Modifying
     @Query("UPDATE board b SET b.title = :title WHERE b.id = :id")
     void updateTitle(

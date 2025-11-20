@@ -1,44 +1,18 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignUpService {
-  private readonly apiUrl = 'http://localhost:8080/users'; // URL do backend
+  private readonly apiUrl = environment.apiUrl + '/users/createUser';
 
-  private readonly http=inject(HttpClient);
-  
-  signUp(user: {name: string; email: string; password: string }) {
-    return this.http.post(this.apiUrl+"/createUser", user, { responseType: 'text' });
+  constructor(private readonly http: HttpClient) {}
 
+  register(user: User): Observable<User> {
+    return this.http.post<User>(this.apiUrl, user);
   }
-
-
-  saveToken(token: string): void {
-    localStorage.setItem('jwtToken', token);
-  }
-
-  saveOwnerId(ownerId: string): void {
-    localStorage.setItem('ownerId', ownerId);
-  }
-  
-
-  getToken(): string | null {
-    return localStorage.getItem('jwtToken');
-  }
-
-  getAuthenticatedHeaders(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-  }
-
-  getProtectedResource(): Observable<any> {
-    const headers = this.getAuthenticatedHeaders();
-    return this.http.get(this.apiUrl + "protected/resource", { headers });
-  }
-
 }
