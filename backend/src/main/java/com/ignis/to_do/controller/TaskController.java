@@ -52,6 +52,11 @@ public class TaskController {
         return taskService.updateTaskTitle(taskDTO);
     }
 
+    @PutMapping("/updateTaskList/{taskId}/{listId}")
+    public TaskDTO updateTaskList(@PathVariable Long taskId, @PathVariable Long listId) {
+        return taskService.updateTaskList(taskId, listId);
+    }
+
     @DeleteMapping("/deleteTask/{taskId}")
     public void deleteTaskById(@PathVariable Long taskId) {
         

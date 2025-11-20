@@ -30,7 +30,7 @@ public class BoardService {
 
     public BoardDTO createBoard(BoardDTO boardDTO) {
 
-        Optional<Board> existingBoard = boardRepository.findByTitle(boardDTO.getTitle());
+        Optional<Board> existingBoard = boardRepository.findByTitleAndOwnerId(boardDTO.getTitle(), boardDTO.getOwnerId());
         if (existingBoard.isPresent()) {
             throw new BoardAlreadyExistsException(BOARD_ALREADY_EXISTS.formatted(boardDTO.getTitle()));
         }
@@ -39,7 +39,7 @@ public class BoardService {
         Board board = new Board(boardDTO.getTitle(), user);
         boardRepository.save(board);
         return new BoardDTO(board.getId(), board.getTitle(),
-            board.getOwner().getId());
+            board.isFavorite(), board.getOwner().getId());
     }
 
     public BoardDTO getBoardById(Long boardId) {
@@ -47,7 +47,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(()
          -> new BoardNotFoundException(BOARD_NOT_FOUND.formatted(boardId)));
         return new BoardDTO(board.getId(), board.getTitle(), 
-            board.getOwner().getId());
+            board.isFavorite(), board.getOwner().getId());
     }
 
     public void verifyIfBoardExists(Long boardId) {
@@ -58,14 +58,14 @@ public class BoardService {
     public Iterable<BoardDTO> getAllBoards() {
         
         return boardRepository.findAll().stream().map(board -> new BoardDTO(
-            board.getId(), board.getTitle(), board.getOwner().getId())).toList();
+            board.getId(), board.getTitle(), board.isFavorite(), board.getOwner().getId())).toList();
     }
 
     public Iterable<BoardDTO> getMyBoardsByOwnerId(Long ownerId) {
 
         User user = userService.getUser(ownerId);  
         return user.getBoards().stream().map(board -> new BoardDTO(board.getId(),
-             board.getTitle(), board.getOwner().getId())).toList();
+             board.getTitle(), board.isFavorite(), board.getOwner().getId())).toList();
     }
 
     public Iterable<TaskListDTO> myTasksListsByBoardId(Long boardId){
@@ -73,7 +73,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(()
          -> new BoardNotFoundException(BOARD_NOT_FOUND.formatted(boardId)));
         return board.getTaskLists().stream().map(taskList -> new TaskListDTO(
-            taskList.getId(), taskList.getName(), taskList.getBoard().getId())).toList();
+            taskList.getId(), taskList.getTitle(), taskList.getBoard().getId())).toList();
     }
 
     public boolean isFavorite(Long boardId) {
@@ -104,7 +104,7 @@ public class BoardService {
         Long boardId = boardDTO.getId();
         Board board = boardRepository.findById(boardId).orElseThrow(()
         -> new BoardNotFoundException(BOARD_NOT_FOUND.formatted(boardId)));
-        return new BoardDTO(boardId, boardDTO.getTitle(), board.getOwner().getId());
+        return new BoardDTO(boardId, boardDTO.getTitle(), board.isFavorite(), board.getOwner().getId());
     }
 
     

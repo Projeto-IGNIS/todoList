@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class BoardDTO {
     private Long id;
     private String title;
+    private boolean favorite;
     private Long ownerId;
 }

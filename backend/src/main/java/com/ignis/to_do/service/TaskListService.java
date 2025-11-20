@@ -25,19 +25,19 @@ public class TaskListService {
     }
     
     public TaskListDTO createTaskList(TaskListDTO taskListDTO) {
-        if (taskListRepository.findByName(taskListDTO.getTitle()).isPresent()) {
+        if (taskListRepository.findByTitleAndBoardId(taskListDTO.getTitle(), taskListDTO.getBoardId()).isPresent()) {
             throw new TaskListAlreadyExistsException(TASK_LIST_ALREADY_EXISTS.formatted(taskListDTO.getTitle()));
         }
 
         Board board = boardService.getBoard(taskListDTO.getBoardId());
         TaskList taskList = new TaskList(taskListDTO.getTitle(), board);
-        return new TaskListDTO(taskListRepository.save(taskList).getId(), taskList.getName(), 
+        return new TaskListDTO(taskListRepository.save(taskList).getId(), taskList.getTitle(), 
             taskList.getBoard().getId());
     }
 
     public TaskListDTO getTaskListById(Long taskLitsId) {
         return taskListRepository.findById(taskLitsId)
-                .map(taskList -> new TaskListDTO(taskList.getId(), taskList.getName(), taskList.getBoard().getId()))
+                .map(taskList -> new TaskListDTO(taskList.getId(), taskList.getTitle(), taskList.getBoard().getId()))
                 .orElseThrow(() -> new TaskListNotFoundException(TASK_LIST_NOT_FOUND.formatted(taskLitsId)));
     }
 
@@ -48,7 +48,7 @@ public class TaskListService {
 
     public Iterable<TaskListDTO> getAllTaskLists() {
         return taskListRepository.findAll().stream().map(taskList -> new TaskListDTO(
-            taskList.getId(), taskList.getName(), taskList.getBoard().getId())).toList();
+            taskList.getId(), taskList.getTitle(), taskList.getBoard().getId())).toList();
     }
 
     public TaskList getList(Long taskListId) {

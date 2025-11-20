@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Board } from '../../models/board.model';
 import { TaskList } from '../../models/task-list.model';
 import { Task, TaskStatus } from '../../models/task.model';
@@ -12,7 +13,7 @@ import { NotificationService } from '../../services/notification.service';
 @Component({
   selector: 'app-task-list-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './task-list-view.component.html',
   styleUrls: ['./task-list-view.component.css']
 })
@@ -219,6 +220,33 @@ export class TaskListViewComponent implements OnChanges {
         this.loadAllTasks();
       }
     });
+  }
+
+  drop(event: CdkDragDrop<Task[]>): void {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      const task = event.previousContainer.data[event.previousIndex];
+      const newListId = parseInt(event.container.id.replace('cdk-drop-list-', ''));
+      this.taskService.updateTaskList(task.id!, newListId).subscribe({
+        next: () => {
+          transferArrayItem(
+            event.previousContainer.data,
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex,
+          );
+          this.notificationService.showSuccess('Tarefa movida com sucesso!');
+        },
+        error: () => {
+          this.notificationService.showError('Erro ao mover tarefa');
+        }
+      });
+    }
+  }
+
+  getConnectedLists(): string[] {
+    return this.taskLists.map(list => 'cdk-drop-list-' + list.id);
   }
 
   // Filtering and sorting

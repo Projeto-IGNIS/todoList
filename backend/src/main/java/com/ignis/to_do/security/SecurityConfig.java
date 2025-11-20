@@ -2,6 +2,7 @@ package com.ignis.to_do.security;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig{
+
+    @Value("${jwt.secret.key}")
+    private String jwtSecretKey;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
@@ -46,12 +50,11 @@ public class SecurityConfig{
 
     @Bean
     JwtDecoder jwtDecoder() {
-        String secretKey = System.getenv("JWT_SECRET_KEY");
-        if (secretKey == null || secretKey.length() < 32) {
+        if (jwtSecretKey == null || jwtSecretKey.length() < 32) {
             throw new IllegalStateException("JWT_SECRET_KEY não configurada ou muito curta");
         }
         
-        byte[] keyBytes = secretKey.getBytes();
+        byte[] keyBytes = jwtSecretKey.getBytes();
         SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "HmacSHA256");
         return NimbusJwtDecoder.withSecretKey(secretKeySpec).build();
     }

@@ -4,6 +4,8 @@ import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,7 +27,8 @@ public class Task {
     private String title;
     private String description;
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
     @ManyToOne
     @JoinColumn(name = "list_id")
     private TaskList list;
@@ -34,7 +37,7 @@ public class Task {
     private Category category;
     private Date dueDate;
 
-    public Task(String title, TaskList list, String status) {
+    public Task(String title, TaskList list, TaskStatus status) {
         this.title = title;
         this.list = list;
         this.status = status;
@@ -62,7 +65,6 @@ public class Task {
     } 
     
     public void assignCategory(Category category) {
-        //this.category = category;
         this.setCategory(category);
     }
 

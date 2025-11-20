@@ -107,7 +107,7 @@
         </div>
 
         <!-- Tasks -->
-        <div class="tasks-list">
+        <div class="tasks-list" cdkDropList [id]="'cdk-drop-list-' + list.id" [cdkDropListData]="getFilteredTasks(list.id!)" [cdkDropListConnectedTo]="getConnectedLists()" (cdkDropListDropped)="drop($event)">
           <div *ngIf="getFilteredTasks(list.id!).length === 0" class="empty-list">
             <p>Nenhuma tarefa encontrada</p>
           </div>
@@ -115,6 +115,7 @@
           <div
             *ngFor="let task of getFilteredTasks(list.id!)"
             class="task-item"
+            cdkDrag
             [class.completed]="task.status === TaskStatus.COMPLETED"
             [class.overdue]="isOverdue(task)"
           >
